@@ -12,6 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Promise"
         tools:targetApi="33">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <meta-data
+            android:name="com.naver.maps.map.CLIENT_ID"
+            android:value="lnkkr2fn9w" />
     </application>
 
 </manifest>
