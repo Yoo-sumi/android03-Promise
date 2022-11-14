@@ -1,5 +1,6 @@
 package com.boosters.promise
 
+import android.graphics.Point
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.UiThread
@@ -13,13 +14,15 @@ import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val database = Firebase.database("https://promise-c3e7d-default-rtdb.firebaseio.com/")
-        val myRef = database.getReference("message")
+        val myRef = database.getReference("message2")
         //myRef.setValue("hello!!")
-        //myRef.push().setValue("안녕")
+        //myRef.setValue("hello!!")
+        //myRef.push().setValue(Point(1,2))
         //myRef.push().setValue("하세요")
 
         val fm = supportFragmentManager
@@ -29,6 +32,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         mapFragment.getMapAsync(this)
     }
+
     @UiThread
     override fun onMapReady(naverMap: NaverMap) {
         val coord = LatLng(37.5154133, 126.9071288)
@@ -41,4 +45,5 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         marker.position = coord
         marker.map = naverMap
     }
+
 }
