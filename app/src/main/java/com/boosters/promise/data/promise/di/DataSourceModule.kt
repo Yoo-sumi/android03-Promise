@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.boosters.promise.data.database.PromiseDatabase
 import com.boosters.promise.data.database.UserTypeConverter
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -20,7 +18,6 @@ import javax.inject.Singleton
 object DataSourceModule {
 
     private const val PROMISE_DATABASE_NAME = "Promise_Database"
-    private const val REMOTE_DATABASE_URL = "https://promise-c3e7d-default-rtdb.firebaseio.com/"
 
     @Provides
     @Singleton
@@ -41,8 +38,8 @@ object DataSourceModule {
 
     @Provides
     @Singleton
-    fun providePromiseRemoteDatabase(): FirebaseDatabase {
-        return Firebase.database(REMOTE_DATABASE_URL)
+    fun providePromiseRemoteDatabase(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
     }
 
 }

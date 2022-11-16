@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_name">Promise</string>
-    
     <!-- 약속 추가 화면 -->
     <string name="promiseSetting_promiseTitle">제목을 입력하세요</string>
     <string name="promiseSetting_promiseDate">날짜  ⃰</string>
