@@ -50,7 +50,7 @@ class PromiseSettingViewModel @Inject constructor(
             2.0,
             "2022/11/14",
             "12:00",
-            listOf(user)
+            listOf("유수미3", "유수미4")
         )
         viewModelScope.launch {
             promiseRepository.addPromise(promise)
@@ -61,14 +61,14 @@ class PromiseSettingViewModel @Inject constructor(
     fun onClickUpdateButton() {
         val user = User("123", "유수미${count}", 1.0, 2.0)
         val promise = Promise(
-            "-NGu0GJFZKmY4qHTirxB",
-            "엄마와의 데이트",
+            "yZnUNR8dmytomJxoYylF",
+            "꽁치와의 데이트",
             "영등포",
             1.0,
             2.0,
             "2022/11/13",
             "12:00",
-            listOf(user)
+            listOf("유수미1", "유수미2")
         )
         viewModelScope.launch {
             promiseRepository.addPromise(promise)
@@ -79,14 +79,14 @@ class PromiseSettingViewModel @Inject constructor(
     fun onClickDeleteButton() {
         val user = User("123", "유수미${count}", 1.0, 2.0)
         val promise = Promise(
-            "-NGu05_dzkrSv1IF75pM",
+            "uZy3KZ2qeLPVSkp6nqqG",
             "엄마와의 데이트",
             "영등포",
             1.0,
             2.0,
             "2022/11/13",
             "12:00",
-            listOf(user)
+            listOf("유수미1", "유수미2")
         )
         viewModelScope.launch {
             promiseRepository.removePromise(promise)

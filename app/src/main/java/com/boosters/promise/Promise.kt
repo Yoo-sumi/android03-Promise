@@ -12,5 +12,5 @@ data class Promise(
     val destinationY: Double,
     val date: String,
     val time: String,
-    val members: List<User>
+    val members: List<String>
 )

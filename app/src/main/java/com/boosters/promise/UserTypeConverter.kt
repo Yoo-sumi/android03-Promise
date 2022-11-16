@@ -8,13 +8,13 @@ import com.google.gson.Gson
 class UserTypeConverter(private val gson: Gson) {
 
     @TypeConverter
-    fun listToJson(value: List<User>?): String? {
+    fun listToJson(value: List<String>?): String? {
         return gson.toJson(value)
     }
 
     @TypeConverter
-    fun jsonToList(value: String): List<User>? {
-        return gson.fromJson(value, Array<User>::class.java)?.toList()
+    fun jsonToList(value: String): List<String>? {
+        return gson.fromJson(value, Array<String>::class.java)?.toList()
     }
 
 }
