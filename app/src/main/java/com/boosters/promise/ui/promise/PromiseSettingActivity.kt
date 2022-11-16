@@ -24,7 +24,6 @@ class PromiseSettingActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPromiseSettingBinding
     private val viewModel: PromiseSettingViewModel by viewModels()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPromiseSettingBinding.inflate(layoutInflater)
