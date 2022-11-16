@@ -51,9 +51,9 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/appCompatEditText_promiseSetting_promiseDate"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="false"
-                android:layout_height="wrap_content" />
+                android:focusable="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -82,9 +82,9 @@
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/appCompatEditText_promiseSetting_promiseTime"
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="false"
-                android:layout_height="wrap_content" />
+                android:focusable="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -112,10 +112,10 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/appCompatEditText_promiseSetting_promisePlace"
-                android:clickable="true"
-                android:focusable="false"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
@@ -143,10 +143,10 @@
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/appCompatEditText_promiseSetting_promiseMember"
-                android:clickable="true"
-                android:focusable="false"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="false" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -179,26 +179,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout_promiseSetting_promiseMember" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_promiseSetting_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:onClick="@{() -> promiseSettingViewModel.onClickUpdateButton()}"
-            android:text="수정"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/button_promiseSetting_delete" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_promiseSetting_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> promiseSettingViewModel.onClickDeleteButton()}"
-            android:text="삭제"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/button_promiseSetting_update"
-            app:layout_constraintTop_toBottomOf="@+id/button_promiseSetting_completion" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

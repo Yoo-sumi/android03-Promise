@@ -9,6 +9,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object Retrofit {
+
     private const val BASE_URL = "https://openapi.naver.com/"
 
     private val httpHeaderInterceptor = HeaderInterceptor()
@@ -26,9 +27,11 @@ object Retrofit {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(PromiseService::class.java)
+
 }
 
 class HeaderInterceptor : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
             .addHeader("X-Naver-Client-Id", BuildConfig.SEARCH_API_ID)
@@ -37,4 +40,5 @@ class HeaderInterceptor : Interceptor {
 
         return chain.proceed(request)
     }
+
 }
