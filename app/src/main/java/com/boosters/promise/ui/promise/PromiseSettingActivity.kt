@@ -39,10 +39,10 @@ class PromiseSettingActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 if (VERSION.SDK_INT < 33) {
-                    result.data?.extras?.getParcelableArrayList("memberList")
+                    result.data?.extras?.getParcelableArrayList(MEMBER_LIST_KEY)
                 } else {
                     result.data?.extras?.getParcelableArrayList(
-                        "memberList",
+                        MEMBER_LIST_KEY,
                         UserUiState::class.java
                     )
                 }?.let {
@@ -165,6 +165,7 @@ class PromiseSettingActivity : AppCompatActivity() {
         const val DATEPICKER_TAG = "New Selected Date"
         const val TIMEPICKER_TAG = "New Selected Time"
         const val SEARCH_DIALOG_TAG = "New Search Address Dialog"
+        const val MEMBER_LIST_KEY = "memberList"
     }
 
 }
