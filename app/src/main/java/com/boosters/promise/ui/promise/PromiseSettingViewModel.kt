@@ -1,5 +1,6 @@
 package com.boosters.promise.ui.promise
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boosters.promise.data.promise.PromiseRepository
@@ -21,13 +22,13 @@ class PromiseSettingViewModel @Inject constructor(
     val dialogEventFlow: SharedFlow<EventType> = _dialogEventFlow.asSharedFlow()
 
     private val _promiseSettingUiState: MutableStateFlow<PromiseSettingUiState> =
-        MutableStateFlow(PromiseSettingUiState.Empty(PromiseUiState()))
+        MutableStateFlow(PromiseSettingUiState(PromiseUiState()))
     val promiseSettingUiState: StateFlow<PromiseSettingUiState> =
         _promiseSettingUiState.asStateFlow()
 
     fun updateMember(newMemberList: List<UserUiState>) {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise.copy(members = newMemberList))
+            PromiseSettingUiState(it.promise.copy(members = newMemberList))
         }
     }
 
@@ -35,11 +36,16 @@ class PromiseSettingViewModel @Inject constructor(
         _promiseSettingUiState.update {
             val memberList =
                 it.promise.members.filter { member -> member.userCode != removeMember.userCode }
-            PromiseSettingUiState.Empty(it.promise.copy(members = memberList))
+            PromiseSettingUiState(it.promise.copy(members = memberList))
         }
     }
 
     fun onClickCompletionButton() {
+        val promise = promiseSettingUiState.value.promise
+        if (promise.title.isEmpty() || promise.time.isEmpty() || promise.destinationName.isEmpty() || promise.date.isEmpty()) {
+            Log.d("MainActivity", "success")
+            return
+        }
         viewModelScope.launch {
             val promise =
                 _promiseSettingUiState.value.promise.copy(promiseId = "z59PQAn8w4CimSw0kdB1")
@@ -47,12 +53,10 @@ class PromiseSettingViewModel @Inject constructor(
             promiseRepository.addPromise(promise).collect {
                 when (it) {
                     true -> _promiseSettingUiState.emit(
-                        PromiseSettingUiState.Success
+                        _promiseSettingUiState.value.copy(state = true)
                     )
                     false -> _promiseSettingUiState.emit(
-                        PromiseSettingUiState.Fail(
-                            _promiseSettingUiState.value.promise
-                        )
+                        _promiseSettingUiState.value.copy(state = false)
                     )
                 }
             }
@@ -67,31 +71,31 @@ class PromiseSettingViewModel @Inject constructor(
 
     fun setPromiseDate(date: String) {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise.copy(date = date))
+            PromiseSettingUiState(it.promise.copy(date = date))
         }
     }
 
     fun setPromiseTime(time: String) {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise.copy(time = time))
+            PromiseSettingUiState(it.promise.copy(time = time))
         }
     }
 
     fun setPromiseDestination(destination: String) {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise.copy(destinationName = destination))
+            PromiseSettingUiState(it.promise.copy(destinationName = destination))
         }
     }
 
     fun setPromiseTitle(title: String) {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise.copy(title = title))
+            PromiseSettingUiState(it.promise.copy(title = title))
         }
     }
 
     fun initPromiseSettingUiState() {
         _promiseSettingUiState.update {
-            PromiseSettingUiState.Empty(it.promise)
+            PromiseSettingUiState(it.promise)
         }
     }
 

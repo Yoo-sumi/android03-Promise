@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build.VERSION
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,12 +64,12 @@ class PromiseSettingActivity : AppCompatActivity() {
         binding.recyclerViewPromiseSettingPromiseMembers.adapter = promiseMemberListAdapter
         lifecycleScope.launch {
             promiseSettingViewModel.promiseSettingUiState.collect { promiseSettingUiState ->
-                when (promiseSettingUiState) {
-                    is PromiseSettingUiState.Empty -> promiseMemberListAdapter.submitList(
+                when (promiseSettingUiState.state) {
+                    null -> promiseMemberListAdapter.submitList(
                         promiseSettingUiState.promise.members
                     )
-                    is PromiseSettingUiState.Success -> TODO("move to promise detail")
-                    is PromiseSettingUiState.Fail -> showFailDialog()
+                    true -> TODO("move to promise detail")
+                    false -> showFailDialog()
                 }
             }
         }
@@ -164,12 +165,7 @@ class PromiseSettingActivity : AppCompatActivity() {
     }
 
     private fun showMember() {
-        if (promiseSettingViewModel.promiseSettingUiState.value !is PromiseSettingUiState.Empty) {
-            return
-        }
-        val promiseSettingUiState =
-            promiseSettingViewModel.promiseSettingUiState.value as PromiseSettingUiState.Empty
-        val members = ArrayList(promiseSettingUiState.promise.members)
+        val members = ArrayList(promiseSettingViewModel.promiseSettingUiState.value.promise.members)
         val intent =
             Intent(this, InviteActivity::class.java).putParcelableArrayListExtra("member", members)
         getContent.launch(intent)
