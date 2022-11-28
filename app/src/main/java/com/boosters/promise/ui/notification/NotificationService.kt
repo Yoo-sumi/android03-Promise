@@ -28,26 +28,6 @@ class NotificationService : FirebaseMessagingService() {
         val uniId = System.currentTimeMillis().toInt()
         val promise = Gson().fromJson(remoteMessage.data[MESSAGE_BODY], Promise::class.java)
 
-        val intent = Intent(this, PromiseDetailActivity::class.java)
-        intent.putExtra(PromiseCalendarActivity.PROMISE_ID_KEY, promise)
-
-        val pendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
-            addNextIntentWithParentStack(intent)
-            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = CHANNEL_NAME
-        }
-        notificationManager.createNotificationChannel(channel)
-
         val contentText = if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_EDIT) {
             String.format(getString(R.string.notification_edit), promise.date)
         } else if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_ADD) {
@@ -55,6 +35,20 @@ class NotificationService : FirebaseMessagingService() {
         } else {
             String.format(getString(R.string.notification_delete), promise.date)
         }
+
+        val intent = if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_DELETE) {
+            Intent(this, PromiseCalendarActivity::class.java)
+        } else {
+            Intent(this, PromiseDetailActivity::class.java).putExtra(PromiseCalendarActivity.PROMISE_ID_KEY, promise.promiseId)
+        }
+        val pendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(intent)
+            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(createChannel())
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(promise.title)
@@ -64,6 +58,16 @@ class NotificationService : FirebaseMessagingService() {
             .setCategory(Notification.CATEGORY_MESSAGE)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
         notificationManager.notify(uniId, builder.build())
+    }
+
+    private fun createChannel(): NotificationChannel {
+        return NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = CHANNEL_NAME
+        }
     }
 
     companion object {
