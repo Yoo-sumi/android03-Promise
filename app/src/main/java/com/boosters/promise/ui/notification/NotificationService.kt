@@ -50,8 +50,10 @@ class NotificationService : FirebaseMessagingService() {
 
         val contentText = if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_EDIT) {
             String.format(getString(R.string.notification_edit), promise.date)
-        } else {
+        } else if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_ADD) {
             String.format(getString(R.string.notification_add), promise.date)
+        } else {
+            String.format(getString(R.string.notification_delete), promise.date)
         }
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -69,7 +71,9 @@ class NotificationService : FirebaseMessagingService() {
         private const val CHANNEL_NAME = "Notice"
         private const val MESSAGE_BODY = "body"
         private const val MESSAGE_TITLE = "title"
-        private const val NOTIFICATION_EDIT = "0"
+        const val NOTIFICATION_EDIT = "0"
+        const val NOTIFICATION_ADD = "1"
+        const val NOTIFICATION_DELETE = "2"
     }
 
 }

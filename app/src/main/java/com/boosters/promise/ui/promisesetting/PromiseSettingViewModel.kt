@@ -12,6 +12,7 @@ import com.boosters.promise.data.user.User
 import com.boosters.promise.data.user.UserRepository
 import com.boosters.promise.ui.invite.model.UserUiModel
 import com.boosters.promise.ui.invite.model.toUser
+import com.boosters.promise.ui.notification.NotificationService
 import com.boosters.promise.ui.promisesetting.model.PromiseSettingEvent
 import com.boosters.promise.ui.promisesetting.model.PromiseSettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -147,9 +148,9 @@ class PromiseSettingViewModel @Inject constructor(
             val key = serverKeyRepository.getServerKey()
 
             val title = if (_promiseUiState.value.promiseId.isEmpty()) {
-                NOTIFICATION_ADD
+                NotificationService.NOTIFICATION_ADD
             } else {
-                NOTIFICATION_EDIT
+                NotificationService.NOTIFICATION_EDIT
             }
 
             userRepository.getUserList(userCodeList).collectLatest {
@@ -168,8 +169,6 @@ class PromiseSettingViewModel @Inject constructor(
 
     companion object {
         private const val DATE_FORMAT = "yyyy/MM/dd HH:mm"
-        private const val NOTIFICATION_EDIT = "0"
-        private const val NOTIFICATION_ADD = "1"
     }
 
 }
