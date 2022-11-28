@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import com.boosters.promise.R
@@ -89,7 +90,6 @@ class InviteActivity : AppCompatActivity() {
         } else {
             intent.getParcelableArrayListExtra(MEMBER_LIST_KEY, UserUiModel::class.java)
         }
-
         inviteViewModel.initMemberItems(memberItems)
     }
 

@@ -10,8 +10,6 @@ import com.boosters.promise.data.promise.PromiseRepository
 import com.boosters.promise.data.promise.ServerKeyRepository
 import com.boosters.promise.data.user.UserRepository
 import com.boosters.promise.ui.notification.NotificationService
-import com.boosters.promise.ui.promisesetting.PromiseSettingViewModel
-import com.boosters.promise.ui.promisesetting.model.PromiseSettingUiState
 import com.naver.maps.map.overlay.Marker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,8 +42,10 @@ class PromiseDetailViewModel @Inject constructor(
 
     fun setPromiseInfo(promiseId: String) {
         viewModelScope.launch {
-            _promiseInfo.value = promiseRepository.getPromise(promiseId).first().copy()
-            memberMarkers = List(_promiseInfo.value.members.size) { Marker() }
+            promiseRepository.getPromise(promiseId).collectLatest {
+                _promiseInfo.value = it
+                memberMarkers = List(_promiseInfo.value.members.size) { Marker() }
+            }
         }
     }
 
@@ -69,7 +69,9 @@ class PromiseDetailViewModel @Inject constructor(
                 val userCodeList =
                     _promiseInfo.value.members.filter { it.userCode != myInfo.userCode }
                         .map { it.userCode }
-                if (userCodeList.isEmpty()) { return@launch }
+                if (userCodeList.isEmpty()) {
+                    return@launch
+                }
 
                 val key = serverKeyRepository.getServerKey()
 

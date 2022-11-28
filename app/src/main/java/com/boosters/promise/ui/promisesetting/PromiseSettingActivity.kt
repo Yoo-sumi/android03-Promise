@@ -1,7 +1,6 @@
 package com.boosters.promise.ui.promisesetting
 
 import android.content.Intent
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -10,16 +9,15 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.boosters.promise.R
 import com.boosters.promise.data.promise.Promise
 import com.boosters.promise.data.user.toUserUiModel
 import com.boosters.promise.databinding.ActivityPromiseSettingBinding
-import com.boosters.promise.ui.detail.PromiseDetailActivity
 import com.boosters.promise.ui.invite.InviteActivity
 import com.boosters.promise.ui.invite.model.UserUiModel
 import com.boosters.promise.ui.place.PlaceSearchDialogFragment
-import com.boosters.promise.ui.promisecalendar.PromiseCalendarActivity
 import com.boosters.promise.ui.promisesetting.adapter.PromiseMemberListAdapter
 import com.boosters.promise.ui.promisesetting.model.PromiseSettingEvent
 import com.boosters.promise.ui.promisesetting.model.PromiseSettingUiState
@@ -61,47 +59,11 @@ class PromiseSettingActivity : AppCompatActivity() {
         binding.promiseSettingViewModel = promiseSettingViewModel
         setContentView(binding.root)
 
-        promiseMemberListAdapter =
-            PromiseMemberListAdapter { promiseSettingViewModel.removeMember(it) }
-        binding.recyclerViewPromiseSettingPromiseMembers.adapter = promiseMemberListAdapter
-        lifecycleScope.launch {
-            promiseSettingViewModel.promiseUiState.collect { promise ->
-                promiseMemberListAdapter.submitList(promise.members.map { it.toUserUiModel() })
-            }
-        }
-
-        lifecycleScope.launch {
-            promiseSettingViewModel.dialogEventFlow.collectLatest { event: PromiseSettingEvent ->
-                when (event) {
-                    PromiseSettingEvent.SELECT_DATE -> showDatePicker()
-                    PromiseSettingEvent.SELECT_TIME -> showTimePicker()
-                    PromiseSettingEvent.SELECT_PLACE -> showPlaceSearchDialog()
-                    PromiseSettingEvent.SELECT_MEMBER -> showMember()
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            promiseSettingViewModel.promiseSettingUiState.collectLatest { promiseSettingUiState ->
-                when (promiseSettingUiState) {
-                    PromiseSettingUiState.Edit -> return@collectLatest
-                    PromiseSettingUiState.Success -> {
-                        val intent =
-                            Intent(this@PromiseSettingActivity, PromiseDetailActivity::class.java)
-                        intent.putExtra(
-                            PromiseCalendarActivity.PROMISE_ID_KEY,
-                            promiseSettingViewModel.promiseUiState.value
-                        )
-                        startActivity(intent)
-                        finish()
-                    }
-                    is PromiseSettingUiState.Fail -> showStateSnackbar(promiseSettingUiState.message)
-                }
-            }
-        }
-
+        setTitleChangeListener()
+        setObservePromiseUiState()
+        setObserveDialogEvent()
+        setObservePromiseSettingUiState()
         initPromise()
-
     }
 
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
@@ -118,8 +80,6 @@ class PromiseSettingActivity : AppCompatActivity() {
             binding.editTextPromiseSettingPromiseTitle.windowToken,
             0
         )
-        val promiseTitle = binding.editTextPromiseSettingPromiseTitle.text.toString()
-        promiseSettingViewModel.setPromiseTitle(promiseTitle)
     }
 
     private fun showDatePicker() {
@@ -180,7 +140,8 @@ class PromiseSettingActivity : AppCompatActivity() {
     }
 
     private fun showMember() {
-        val memberList = ArrayList(promiseSettingViewModel.promiseUiState.value.members)
+        val memberList =
+            ArrayList(promiseSettingViewModel.promiseUiState.value.members.map { it.toUserUiModel() })
         val intent = Intent(this, InviteActivity::class.java).putParcelableArrayListExtra(
             MEMBER_LIST_KEY,
             memberList
@@ -190,6 +151,50 @@ class PromiseSettingActivity : AppCompatActivity() {
 
     private fun showStateSnackbar(message: Int) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun setTitleChangeListener() {
+        binding.editTextPromiseSettingPromiseTitle.addTextChangedListener {
+            promiseSettingViewModel.setPromiseTitle(it.toString())
+        }
+    }
+
+    private fun setObservePromiseUiState() {
+        promiseMemberListAdapter =
+            PromiseMemberListAdapter { promiseSettingViewModel.removeMember(it) }
+        binding.recyclerViewPromiseSettingPromiseMembers.adapter = promiseMemberListAdapter
+        lifecycleScope.launch {
+            promiseSettingViewModel.promiseUiState.collect { promise ->
+                promiseMemberListAdapter.submitList(promise.members.map { it.toUserUiModel() })
+            }
+        }
+    }
+
+    private fun setObserveDialogEvent() {
+        lifecycleScope.launch {
+            promiseSettingViewModel.dialogEventFlow.collectLatest { event: PromiseSettingEvent ->
+                when (event) {
+                    PromiseSettingEvent.SELECT_DATE -> showDatePicker()
+                    PromiseSettingEvent.SELECT_TIME -> showTimePicker()
+                    PromiseSettingEvent.SELECT_PLACE -> showPlaceSearchDialog()
+                    PromiseSettingEvent.SELECT_MEMBER -> showMember()
+                }
+            }
+        }
+    }
+
+    private fun setObservePromiseSettingUiState() {
+        lifecycleScope.launch {
+            promiseSettingViewModel.promiseSettingUiState.collectLatest { promiseSettingUiState ->
+                when (promiseSettingUiState) {
+                    PromiseSettingUiState.Edit -> return@collectLatest
+                    PromiseSettingUiState.Success -> {
+                        finish()
+                    }
+                    is PromiseSettingUiState.Fail -> showStateSnackbar(promiseSettingUiState.message)
+                }
+            }
+        }
     }
 
     private fun initPromise() {

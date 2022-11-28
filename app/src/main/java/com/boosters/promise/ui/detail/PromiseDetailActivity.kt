@@ -66,21 +66,9 @@ class PromiseDetailActivity : AppCompatActivity(), OnMapReadyCallback {
         setBinding()
 
         initMap()
+        initActionBar()
         setPromiseInfo()
-
-        setSupportActionBar(binding.toolbarPromiseDetail)
-        supportActionBar?.apply {
-            setDisplayShowCustomEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-
-        promiseDetailViewModel.isDeleted.observe(this) {
-            if (it) {
-                finish()
-            } else {
-                showStateSnackbar(R.string.promiseDetail_delete_ask)
-            }
-        }
+        setObserveIsDeleted()
     }
 
     override fun onStart() {
@@ -228,6 +216,24 @@ class PromiseDetailActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun isLocationPermissionGranted(permissionCheckResult: List<Boolean>): Boolean {
         return permissionCheckResult.fold(false) { acc, locationPermission ->
             acc || locationPermission
+        }
+    }
+
+    private fun initActionBar() {
+        setSupportActionBar(binding.toolbarPromiseDetail)
+        supportActionBar?.apply {
+            setDisplayShowCustomEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
+    }
+
+    private fun setObserveIsDeleted() {
+        promiseDetailViewModel.isDeleted.observe(this) {
+            if (it) {
+                finish()
+            } else {
+                showStateSnackbar(R.string.promiseDetail_delete_ask)
+            }
         }
     }
 
