@@ -169,7 +169,7 @@ class PromiseSettingViewModel @Inject constructor(
     }
 
     companion object {
-        private const val DATE_FORMAT = "yyyy/MM/dd HH:mm"
+        const val DATE_FORMAT = "yyyy/MM/dd HH:mm"
     }
 
 }
