@@ -2,7 +2,7 @@ package com.boosters.promise.data.user.source.remote
 
 import com.boosters.promise.data.location.GeoLocation
 import com.boosters.promise.data.network.NetworkConnectionUtil
-import com.boosters.promise.ui.notification.di.UserModule
+import com.boosters.promise.data.user.di.UserModule
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.messaging.FirebaseMessaging

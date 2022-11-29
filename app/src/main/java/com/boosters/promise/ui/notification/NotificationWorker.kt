@@ -3,24 +3,21 @@ package com.boosters.promise.ui.notification
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.boosters.promise.R
 import com.boosters.promise.data.promise.Promise
-import com.boosters.promise.ui.invite.model.UserUiModel
-import com.boosters.promise.ui.promisesetting.PromiseSettingActivity
 
-class AlarmReceiver : BroadcastReceiver() {
+class NotificationWorker(val context: Context, params: WorkerParameters): Worker(context, params) {
 
-    override fun onReceive(context: Context, intent: Intent) {
-        val promiseId = intent.getStringExtra("promiseId")
-        val promiseTitle = intent.getStringExtra("promiseTitle")
-        val promiseDate = intent.getStringExtra("promiseDate")
+    override fun doWork(): Result {
+        val promiseId = inputData.getString("promiseId")
+        val promiseTitle = inputData.getString("promiseTitle")
+        val promiseDate = inputData.getString("promiseDate")
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -33,7 +30,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setCategory(Notification.CATEGORY_MESSAGE)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
         notificationManager.notify(System.currentTimeMillis().toInt(), builder.build())
-
+        return Result.success()
     }
 
     private fun createChannel(): NotificationChannel {

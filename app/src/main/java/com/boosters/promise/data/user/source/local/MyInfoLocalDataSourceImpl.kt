@@ -3,7 +3,7 @@ package com.boosters.promise.data.user.source.local
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.boosters.promise.data.user.User
-import com.boosters.promise.ui.notification.di.UserModule
+import com.boosters.promise.data.user.di.UserModule
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
