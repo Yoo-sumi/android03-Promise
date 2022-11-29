@@ -11,8 +11,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.boosters.promise.R
-import com.boosters.promise.data.alarm.AlarmRepository
-import com.boosters.promise.data.friend.FriendRepository
 import com.boosters.promise.data.promise.Promise
 import com.boosters.promise.ui.detail.PromiseDetailActivity
 import com.boosters.promise.ui.promisecalendar.PromiseCalendarActivity
@@ -20,8 +18,6 @@ import com.boosters.promise.ui.promisesetting.PromiseSettingViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -29,6 +25,8 @@ import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
 class NotificationService : FirebaseMessagingService() {
+
+    private val alarmDiretor = AlarmDiretor(this)
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
@@ -43,8 +41,7 @@ class NotificationService : FirebaseMessagingService() {
         val contentText = if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_EDIT) {
             String.format(getString(R.string.notification_edit), promise.date)
         } else if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_ADD) {
-           // Log.d("MainActivity", "${alarmDiretor}")
-            //alarmDiretor.registerAlarm(0, promise)
+            alarmDiretor.registerAlarm(0, promise)
             String.format(getString(R.string.notification_add), promise.date)
         } else {
             String.format(getString(R.string.notification_delete), promise.date)
@@ -82,6 +79,32 @@ class NotificationService : FirebaseMessagingService() {
         ).apply {
             description = CHANNEL_NAME
         }
+    }
+
+    private fun reserveNotification(promise: Promise) {
+        val date = promise.date.split("/").map { it.toInt() }
+        val time = promise.time.split(":").map { it.toInt() }
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.YEAR, date[0])
+        cal.set(Calendar.MONTH, date[1] - 1)
+        cal.set(Calendar.DAY_OF_MONTH, date[2])
+        cal.set(Calendar.HOUR_OF_DAY, time[0])
+        cal.set(Calendar.MINUTE, time[1])
+
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+            .putExtra("promiseId", promise.promiseId)
+            .putExtra("promiseTitle", promise.title)
+            .putExtra("promiseDate", promise.date)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent,
+            PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, // 절전 모드일 때도 알람 발생
+            cal.timeInMillis,
+            pendingIntent
+        )
     }
 
     companion object {
