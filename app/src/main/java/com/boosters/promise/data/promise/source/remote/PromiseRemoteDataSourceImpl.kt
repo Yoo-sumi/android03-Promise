@@ -16,7 +16,7 @@ class PromiseRemoteDataSourceImpl @Inject constructor(
 
     private val promiseRef = database.collection(DATABASE_PROMISE_REF_PATH)
 
-    override fun addPromise(promise: PromiseBody): Flow<Boolean> {
+    override fun addPromise(promise: PromiseBody): Flow<String> {
         var id = promise.promiseId
         if (promise.promiseId == "") {
             id = promiseRef.document().id
@@ -24,11 +24,11 @@ class PromiseRemoteDataSourceImpl @Inject constructor(
         return callbackFlow {
             promiseRef.document(id).set(promise.copy(promiseId = id))
                 .addOnSuccessListener {
-                    trySend(true)
+                    trySend(id)
                     close()
                 }
                 .addOnFailureListener {
-                    trySend(false)
+                    trySend("")
                     close()
                 }
             awaitClose()

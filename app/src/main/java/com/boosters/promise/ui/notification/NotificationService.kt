@@ -1,11 +1,9 @@
 package com.boosters.promise.ui.notification
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.os.SystemClock
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
@@ -21,14 +19,14 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class NotificationService : FirebaseMessagingService() {
 
-    private val dateFormatter = SimpleDateFormat(PromiseSettingViewModel.DATE_FORMAT, Locale.KOREA)
+    private val alarmDiretor = AlarmDiretor(this)
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         if (remoteMessage.data.isNotEmpty()) {
@@ -43,8 +41,7 @@ class NotificationService : FirebaseMessagingService() {
         val contentText = if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_EDIT) {
             String.format(getString(R.string.notification_edit), promise.date)
         } else if (remoteMessage.data[MESSAGE_TITLE] == NOTIFICATION_ADD) {
-            val promiseTime = dateFormatter.parse("${promise.date} ${promise.time}")?.time ?: System.currentTimeMillis()
-            reserveNotification(promiseTime - System.currentTimeMillis(), promise)
+            alarmDiretor.registerAlarm(0, promise)
             String.format(getString(R.string.notification_add), promise.date)
         } else {
             String.format(getString(R.string.notification_delete), promise.date)
@@ -84,18 +81,30 @@ class NotificationService : FirebaseMessagingService() {
         }
     }
 
-    private fun reserveNotification(duration: Long, promise: Promise) {
-        val data = workDataOf("promiseId" to promise.promiseId,
-            "promiseTitle" to promise.title,
-            "promiseDate" to promise.date)
-        val workManager = WorkManager.getInstance(this)
-        val workRequest = OneTimeWorkRequestBuilder<NotificationWorker>()
-            .setInitialDelay(duration, TimeUnit.MILLISECONDS)
-            .addTag(promise.promiseId)
-            .setInputData(data)
-            .build()
-        workManager.enqueue(workRequest)
+    private fun reserveNotification(promise: Promise) {
+        val date = promise.date.split("/").map { it.toInt() }
+        val time = promise.time.split(":").map { it.toInt() }
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.YEAR, date[0])
+        cal.set(Calendar.MONTH, date[1] - 1)
+        cal.set(Calendar.DAY_OF_MONTH, date[2])
+        cal.set(Calendar.HOUR_OF_DAY, time[0])
+        cal.set(Calendar.MINUTE, time[1])
 
+        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+            .putExtra("promiseId", promise.promiseId)
+            .putExtra("promiseTitle", promise.title)
+            .putExtra("promiseDate", promise.date)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this, 0, intent,
+            PendingIntent.FLAG_IMMUTABLE)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, // 절전 모드일 때도 알람 발생
+            cal.timeInMillis,
+            pendingIntent
+        )
     }
 
     companion object {

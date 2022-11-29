@@ -1,5 +1,6 @@
 package com.boosters.promise.ui.promisesetting
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.boosters.promise.data.location.GeoLocation
@@ -80,10 +81,14 @@ class PromiseSettingViewModel @Inject constructor(
         viewModelScope.launch {
             val members = promise.members.toMutableList()
             members.add(myInfo.copy(userToken = ""))
-            promiseRepository.addPromise(promise.copy(members = members)).collect {
-                when (it) {
-                    true -> sendNotification()
-                    false -> changeUiState(PromiseSettingUiState.Fail(R.string.promiseSetting_fail))
+            promiseRepository.addPromise(promise.copy(members = members)).collect { promiseId ->
+                if (promiseId.isEmpty()) {
+                    changeUiState(PromiseSettingUiState.Fail(R.string.promiseSetting_fail))
+                } else {
+                    _promiseUiState.update {
+                        it.copy(promiseId = promiseId)
+                    }
+                    sendNotification()
                 }
             }
         }

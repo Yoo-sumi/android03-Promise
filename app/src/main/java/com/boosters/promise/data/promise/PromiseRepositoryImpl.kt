@@ -11,7 +11,7 @@ class PromiseRepositoryImpl @Inject constructor(
     private val promiseRemoteDataSource: PromiseRemoteDataSource,
 ) : PromiseRepository {
 
-    override fun addPromise(promise: Promise): Flow<Boolean> {
+    override fun addPromise(promise: Promise): Flow<String> {
         return promiseRemoteDataSource.addPromise(promise.toPromiseBody())
     }
 
