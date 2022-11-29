@@ -5,14 +5,27 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.ALARM_SERVICE
 import android.content.Intent
+import android.util.Log
+import com.boosters.promise.data.alarm.AlarmRepository
 import com.boosters.promise.data.promise.Promise
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.util.*
+import javax.inject.Inject
 
-class AlarmDiretor(private val context: Context) {
+class AlarmDiretor (
+    val context: Context,
+    private val alarmRepository: AlarmRepository
+) {
+
+    private val coroutineScope by lazy { CoroutineScope(Dispatchers.IO) }
 
     private val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 
     fun registerAlarm(requestCode: Int, promise: Promise) {
+        Log.d("MainActivity", "등록")
+
         val date = promise.date.split("/").map { it.toInt() }
         val time = promise.time.split(":").map { it.toInt() }
         val cal = Calendar.getInstance()
